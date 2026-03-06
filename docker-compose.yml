@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+
+  backend:
+    build: .
+    image: frappe-lms-payments
+    command: bench start
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+    depends_on:
+      - db
+      - redis-cache
+      - redis-queue
+
+  db:
+    image: mariadb:10.6
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+    volumes:
+      - db-data:/var/lib/mysql
+
+  redis-cache:
+    image: redis:6.2-alpine
+
+  redis-queue:
+    image: redis:6.2-alpine
+
+  frontend:
+    image: frappe-lms-payments
+    command: nginx-entrypoint.sh
+    ports:
+      - "8080:8080"
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+    depends_on:
+      - backend
+
+volumes:
+  db-data:
+  sites:
