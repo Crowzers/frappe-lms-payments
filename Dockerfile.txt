@@ -1,0 +1,14 @@
+FROM frappe/bench:latest
+
+USER frappe
+
+RUN bench init frappe-bench --frappe-branch version-15
+
+WORKDIR /home/frappe/frappe-bench
+
+RUN bench get-app lms https://github.com/frappe/lms
+RUN bench get-app payments https://github.com/frappe/payments
+
+RUN bench build
+
+USER root
